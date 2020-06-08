@@ -1,4 +1,5 @@
 FROM python:3.7-alpine
+# FROM python:3.7-buster
 MAINTAINER FVenneri
 
 ENV PYTHONUNBUFFERED 1
