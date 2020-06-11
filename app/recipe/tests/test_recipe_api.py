@@ -203,6 +203,52 @@ class PrivateRecipeApiTests(TestCase):
         self.assertEqual(recipe.price, payload['price'])
         self.assertEqual(len(recipe.tags.all()), 0)
 
+    def test_filter_recipes_by_tags(self):
+        recipe1 = sample_recipe(user=self.user, title='Burger')
+        recipe2 = sample_recipe(user=self.user, title='Steak')
+        tag1 = sample_tag(user=self.user, name='Fast Food')
+        tag2 = sample_tag(user=self.user, name='Slow Food')
+        recipe1.tags.add(tag1)
+        recipe2.tags.add(tag2)
+        recipe3 = sample_recipe(user=self.user, title='Fish and chips')
+
+        res = self.client.get(
+            RECIPES_URL,
+            {'tags': f'{tag1.id},{tag2.id}'}
+        )
+
+        serializer1 = RecipeSerializer(recipe1)
+        serializer2 = RecipeSerializer(recipe2)
+        serializer3 = RecipeSerializer(recipe3)
+        self.assertIn(serializer1.data, res.data)
+        self.assertIn(serializer2.data, res.data)
+        self.assertNotIn(serializer3.data, res.data)
+
+    def test_filter_recipes_by_ingredients(self):
+        recipe1 = sample_recipe(user=self.user, title='Chicken wings')
+        recipe2 = sample_recipe(user=self.user, title='Smoked salmon')
+        ingredient1 = sample_ingredient(user=self.user, name='Chicken')
+        ingredient2 = sample_ingredient(user=self.user, name='Salmon')
+        recipe1.ingredients.add(ingredient1)
+        recipe2.ingredients.add(ingredient2)
+        recipe3 = sample_recipe(user=self.user, title='Fish and chips')
+        recipe3.ingredients.add(sample_ingredient(user=self.user, name='Cod'))
+        recipe3.ingredients.add(
+            sample_ingredient(user=self.user, name='Potato')
+        )
+
+        res = self.client.get(
+            RECIPES_URL,
+            {'ingredients': f'{ingredient1.id},{ingredient2.id}'}
+        )
+
+        serializer1 = RecipeSerializer(recipe1)
+        serializer2 = RecipeSerializer(recipe2)
+        serializer3 = RecipeSerializer(recipe3)
+        self.assertIn(serializer1.data, res.data)
+        self.assertIn(serializer2.data, res.data)
+        self.assertNotIn(serializer3.data, res.data)
+
 
 class RecipeUploadImageTests(TestCase):
     """Tests for image uploading"""
