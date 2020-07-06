@@ -13,8 +13,13 @@ from recipe.serializers import IngredientSerializer
 INGREDIENTS_URL = reverse('recipe:ingredient-list')
 
 
+def detail_url(ingredient_id):
+    """Return ingredient URL"""
+    return reverse('recipe:ingredient-detail', args=[ingredient_id])
+
+
 class PublicIngredientsApiTest(TestCase):
-    """Test publicly available ingedients API"""
+    """Test publicly available ingredients API"""
 
     def setUp(self):
         self.client = APIClient()

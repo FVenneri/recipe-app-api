@@ -273,9 +273,14 @@ class RecipeUploadImageTests(TestCase):
                 url, {'image': temporary_file}, format='multipart'
             )
         self.recipe.refresh_from_db()
+
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertIn('image', res.data)
         self.assertTrue(os.path.exists(self.recipe.image.path))
+
+        url = detail_url(self.recipe.id)
+        res_recipe = self.client.get(url)
+        self.assertIn('image', res_recipe.data)
 
     def test_upload_image_recipe_invalid(self):
         """Test uploading the invalid image for a recipe"""
